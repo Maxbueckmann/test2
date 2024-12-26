@@ -1,0 +1,952 @@
+# TimeSheet - Umfassende Projektanalyse
+
+## Übersicht
+- **Projektname**: TimeSheet - Professionelles Zeiterfassungstool
+- **Typ**: Webbasierte Unternehmensanwendung
+- **Hauptzweck**: Digitale Zeiterfassung und Projektzeitverwaltung für Dual-Studierende
+- **Zielgruppe**: DHBW-Studierende und Unternehmen
+- **Version**: 1.0.0
+- **Entwicklungsstatus**: Produktionsbereit
+
+## Technischer Aufbau
+
+### Basis-Technologien
+- **Frontend Framework**: React mit TypeScript
+- **Build-System**: Vite (schnelle Entwicklung und Optimierung)
+- **Styling**: 
+  - Tailwind CSS für responsive Designs
+  - Shadcn UI für konsistente Komponenten
+  - Custom CSS für spezifische Anpassungen
+- **State Management**: 
+  - Zustand mit Persistenz
+  - Lokale Speicherung für Offline-Funktionalität
+- **Code-Qualität**: 
+  - ESLint für Code-Standards
+  - TypeScript für Typ-Sicherheit
+  - Prettier für Formatierung
+- **UI-Komponenten**: 
+  - Radix UI als Basis
+  - Shadcn für erweiterte Komponenten
+  - Custom Components für spezifische Anforderungen
+- **Entwicklungsmodus**: 
+  - Hot Module Replacement (HMR)
+  - Debug-Tooling
+  - Development Server
+
+### Detaillierte Architektur
+Die Anwendung folgt einer modernen, komponentenbasierten Architektur:
+
+#### Kernkomponenten und deren Funktionen
+
+1. **Zeiterfassungsmodule**
+   - **ActiveSession**:
+     - Echtzeit-Tracking der aktuellen Sitzung
+     - Pausenverwaltung
+     - Status-Anzeige
+     - Automatische Speicherung
+   
+   - **TimerSection**:
+     - Präzise Zeitmessung
+     - Start/Stop/Pause Funktionalität
+     - Automatische Rundung
+     - Manuelle Zeitanpassung
+   
+   - **WeeklyOverview**:
+     - Tabellarische Wochenansicht
+     - Aggregierte Zeitberechnung
+     - Filterfunktionen
+     - Export-Möglichkeiten
+   
+   - **StartModal**:
+     - Projektauswahl
+     - Aktivitätsdefinition
+     - Vorausfüllung häufiger Einträge
+     - Validierung der Eingaben
+
+2. **Benutzerinteraktionsmodule**
+   - **Sidebar**:
+     - Dynamische Navigation
+     - Kontextabhängige Menüs
+     - Status-Übersicht
+     - Schnellzugriff-Funktionen
+   
+   - **ConfigurationSection**:
+     - Projektverwaltung
+     - Aktivitätskonfiguration
+     - Benutzerpräferenzen
+     - System-Einstellungen
+   
+   - **UI-Komponenten**:
+     - Responsive Design (Mobile-First)
+     - Dark/Light Mode
+     - Barrierefreiheit
+     - Lokalisierung
+
+## Funktionale Spezifikation
+
+### Kernfunktionalitäten
+
+1. **Zeiterfassungssystem**
+   - **Arbeitszeiten**:
+     - Minutengenaue Erfassung
+     - Automatische Rundung (konfigurierbar)
+     - Überstundenberechnung
+     - Pausenautomatik
+   
+   - **Projektzeiten**:
+     - Automatische Kategorisierung
+     - Projekt-Hierarchien
+     - Aktivitätszuordnung
+     - Zeitbudgetierung
+   
+   - **Abwesenheitsmanagement**:
+     - Urlaubsverwaltung
+     - Krankheitstage
+     - Universitätszeiten
+     - Feiertage
+   
+   - **Pausenverwaltung**:
+     - Automatische Pausenerkennung
+     - Manuelle Pauseneingabe
+     - Pausenregeln
+     - Compliance-Prüfung
+
+2. **Projektmanagement**
+   - **Projektzuordnung**:
+     - Hierarchische Strukturen
+     - Aktivitätsgruppen
+     - Berechtigungen
+     - Templates
+   
+   - **Kategorisierung**:
+     - Mehrstufige Kategorien
+     - Dynamische Zuordnung
+     - Filteroptionen
+     - Statistiken
+   
+   - **Kommentarsystem**:
+     - Strukturierte Kommentare
+     - Vorlagen
+     - Verlaufsverfolgung
+     - Markup-Unterstützung
+
+### Datenmodell (Detailliert)
+
+#### TimeEntry (Zeiteintrag)
+```typescript
+type TimeEntry = {
+  id: string;                    // Eindeutige UUID
+  startTime: Date;              // Startzeitpunkt
+  endTime?: Date;               // Endzeitpunkt (optional bei laufenden Einträgen)
+  type: "work" | "absence";     // Unterscheidung Arbeit/Abwesenheit
+  activity: string;             // Zugeordnete Aktivität
+  projectId: string;            // Projekt-Referenz
+  category: string;             // Kategorisierung
+  comment: string;              // Allgemeiner Kommentar
+  initialComment?: string;      // Startkommentar
+  finalComment?: string;        // Abschlusskommentar
+  pauses: Pause[];             // Liste der Pausen
+  totalDuration?: number;       // Gesamtdauer in ms
+  adjustedDuration?: number;    // Angepasste Dauer
+  externalComment?: string;     // Externer Kommentar
+};
+```
+
+#### Projektkonfiguration (Detailliert)
+
+1. **Arbeitszeit (890023)**
+   - **Ausbildungszeit**:
+     - Tutorials
+     - Schulungen
+     - Einarbeitung
+     - Dokumentation
+   
+   - **Projektarbeit**:
+     - Entwicklung
+     - Testing
+     - Dokumentation
+     - Review
+   
+   - **Meetings**:
+     - One2One
+     - Team-Meetings
+     - Schulungen
+     - Workshops
+
+2. **Abwesenheit (890085)**
+   - **Universitätszeiten**:
+     - Vorlesungen
+     - Prüfungen
+     - Projektarbeiten
+   
+   - **Urlaub/Feiertage**:
+     - Jahresurlaub
+     - Sonderurlaub
+     - Feiertage
+     - Wellness
+
+### State Management (Erweitert)
+
+#### Store-Architektur
+```typescript
+interface TimeEntryStore {
+  entries: TimeEntry[];
+  currentEntry?: TimeEntry;
+  addEntry: (entry: TimeEntry) => void;
+  updateEntry: (id: string, entry: Partial<TimeEntry>) => void;
+  deleteEntry: (id: string) => void;
+  startTimer: (entry: Partial<TimeEntry>) => void;
+  stopTimer: () => void;
+  calculateStatistics: () => Statistics;
+}
+
+interface ConfigurationStore {
+  projects: Project[];
+  activities: Activity[];
+  settings: Settings;
+  addProject: (project: Project) => void;
+  updateProject: (id: string, project: Partial<Project>) => void;
+  deleteProject: (id: string) => void;
+  // weitere Methoden...
+}
+```
+
+## Entwicklungsrichtlinien (Erweitert)
+- **TypeScript**:
+  - Strict Mode aktiviert
+  - Vollständige Typ-Abdeckung
+  - Interface-basierte Entwicklung
+  - Generische Komponenten
+
+- **React Best Practices**:
+  - Funktionale Komponenten
+  - Custom Hooks
+  - Memoization
+  - Error Boundaries
+
+- **Code-Qualität**:
+  - Unit Tests
+  - Integration Tests
+  - Performance Monitoring
+  - Code Coverage
+
+## Besondere Funktionen
+- **Zeitsynchronisation**:
+  - Server-Zeit-Synchronisation
+  - Zeitzonenverwaltung
+  - Rundungsregeln
+  - Überstundenberechnung
+
+- **Reporting**:
+  - Wochenberichte
+  - Monatsübersichten
+  - Projektauswertungen
+  - Export-Funktionen
+
+- **Integration**:
+  - REST API Vorbereitung
+  - Externe System-Anbindung
+  - SSO-Vorbereitung
+  - Datenimport/-export
+
+## Komponenten-Dokumentation
+
+### UI-Basiskomponenten
+1. **Accordion**
+   - Erweiterbare/Kollabierbare Panels
+   - Basiert auf Radix UI Primitives
+   - Verwendet für gruppierte Informationen
+
+2. **Button**
+   - Verschiedene Varianten (Primary, Secondary, Ghost)
+   - Größenanpassung
+   - Icon-Integration
+   - Zustände (Disabled, Loading)
+
+3. **Card**
+   - Container-Komponente
+   - Schatten und Rahmen
+   - Flexibles Layout
+   - Header/Body/Footer-Struktur
+
+4. **Command**
+   - Kommandopalette
+   - Suchfunktion
+   - Keyboard-Navigation
+   - Filterfunktionen
+
+5. **Dialog/Modal**
+   - Overlay-Fenster
+   - Fokus-Management
+   - Keyboard-Interaktion
+   - Verschiedene Größen
+
+6. **Select**
+   - Dropdown-Auswahl
+   - Suchfunktion
+   - Gruppierung
+   - Multi-Select Option
+
+7. **Sheet**
+   - Seitenleisten-Panel
+   - Animierte Übergänge
+   - Responsive Anpassung
+   - Verschiedene Positionen
+
+### Zeiterfassungs-Komponenten
+
+1. **ActiveSession**
+   - Zweck: Aktive Zeitsitzung-Verwaltung
+   - Props:
+     - currentEntry: TimeEntry
+     - onPause: () => void
+     - onStop: () => void
+   - Hauptfunktionen:
+     - Zeitanzeige
+     - Pausenverwaltung
+     - Status-Updates
+
+2. **TimerSection**
+   - Zweck: Hauptzeiterfassung
+   - Props:
+     - onStart: (entry: TimeEntry) => void
+     - onStop: () => void
+   - Features:
+     - Timer-Steuerung
+     - Projekt-/Aktivitätsauswahl
+     - Kommentarerfassung
+
+3. **WeeklyOverview**
+   - Zweck: Wochenübersicht
+   - Props:
+     - entries: TimeEntry[]
+     - onEdit: (entry: TimeEntry) => void
+   - Features:
+     - Tabellarische Ansicht
+     - Zeitaggregation
+     - Bearbeitungsfunktionen
+
+4. **StartModal**
+   - Zweck: Neue Zeiterfassung starten
+   - Props:
+     - isOpen: boolean
+     - onClose: () => void
+     - onStart: (config: StartConfig) => void
+   - Features:
+     - Projektwahl
+     - Aktivitätswahl
+     - Initialkommentar
+
+### Konfigurations-Komponenten
+
+1. **ConfigurationSection**
+   - Zweck: Projektkonfiguration
+   - Features:
+     - Projektverwaltung
+     - Aktivitätsverwaltung
+     - Einstellungen
+
+2. **Sidebar**
+   - Zweck: Navigation
+   - Features:
+     - Menüstruktur
+     - Statusanzeige
+     - Schnellzugriffe
+
+### Utility-Komponenten
+
+1. **DatePicker**
+   - Kalendar-Auswahl
+   - Zeitspannen-Selektion
+   - Lokalisierung
+
+2. **TimeInput**
+   - Zeiteingabe
+   - Formatierung
+   - Validierung
+
+3. **CommentField**
+   - Mehrzeilige Eingabe
+   - Markdown-Support
+   - Vorlagen-System
+
+4. **StatusIndicator**
+   - Zustandsanzeige
+   - Farbkodierung
+   - Animation
+
+### Layout-Komponenten
+
+1. **MainLayout**
+   - Grundstruktur
+   - Responsive Design
+   - Navigation Integration
+
+2. **ContentArea**
+   - Hauptinhaltsbereich
+   - Scrolling-Verhalten
+   - Responsive Anpassung
+
+3. **HeaderSection**
+   - Titelbereich
+   - Aktionsbuttons
+   - Breadcrumbs
+
+### Spezial-Komponenten
+
+1. **Statistics**
+   - Zeitauswertungen
+   - Grafische Darstellung
+   - Exportfunktionen
+
+2. **ProjectSelector**
+   - Hierarchische Projektwahl
+   - Suchfunktion
+   - Favoriten
+
+3. **ActivityLogger**
+   - Aktivitätsprotokoll
+   - Filterung
+   - Sortierung
+
+## Komponenten-Interaktion
+
+### Hauptkomponenten-Flow
+1. **Zeiterfassungs-Flow**
+   - `StartModal` → `TimerSection` → `ActiveSession` → `WeeklyOverview`
+   - Datenaustausch über Zustand Store
+   - Event-basierte Kommunikation zwischen Komponenten
+   - Automatische UI-Updates durch State Changes
+
+2. **Konfigurations-Flow**
+   - `Sidebar` → `ConfigurationSection` → `ProjectSelector`
+   - Zentrale Konfigurationsverwaltung
+   - Direkte Store-Updates
+   - Live-Aktualisierung aller abhängigen Komponenten
+
+3. **Daten-Flow**
+   - Unidirektionaler Datenfluss
+   - Parent-to-Child Props
+   - Callback-basierte Aktualisierungen
+   - Store-basierte Zustandsverwaltung
+
+### Komponenten-Abhängigkeiten
+1. **UI-Layer**
+   ```
+   MainLayout
+   ├── Sidebar
+   ├── HeaderSection
+   └── ContentArea
+       ├── TimerSection
+       │   └── ActiveSession
+       ├── WeeklyOverview
+       └── ConfigurationSection
+   ```
+
+2. **Funktionale Abhängigkeiten**
+   ```
+   TimeEntryStore
+   ├── TimerSection (Schreiben)
+   ├── ActiveSession (Lesen/Schreiben)
+   └── WeeklyOverview (Lesen)
+
+   ConfigurationStore
+   ├── ConfigurationSection (Schreiben)
+   ├── ProjectSelector (Lesen)
+   └── TimerSection (Lesen)
+   ```
+
+## Technische Implementierung
+
+### Codestruktur
+1. **Verzeichnisstruktur**
+   ```
+   src/
+   ├── components/
+   │   ├── timesheet/     # Hauptkomponenten
+   │   ├── ui/            # UI-Basiskomponenten
+   │   └── shared/        # Gemeinsame Komponenten
+   ├── lib/               # Hilfsfunktionen
+   ├── stores/            # Zustand Stores
+   └── types/             # TypeScript Definitionen
+   ```
+
+2. **Komponenten-Implementierung**
+   - **Funktionale Komponenten**: React Hooks basiert
+   - **TypeScript**: Strikte Typisierung
+   - **Styling**: Tailwind + CSS Module
+   - **State**: Zustand + localStorage
+
+### Technologie-Stack Begründung
+
+1. **React + TypeScript**
+   - Warum: Typsicherheit, bessere IDE-Unterstützung
+   - Vorteile: 
+     - Frühe Fehlererkennung
+     - Bessere Code-Dokumentation
+     - Einfachere Wartung
+
+2. **Zustand für State Management**
+   - Warum: Leichtgewichtig, einfach zu verwenden
+   - Vorteile:
+     - Minimaler Boilerplate
+     - Gute Performance
+     - Einfache Persistenz
+
+3. **Tailwind CSS**
+   - Warum: Schnelle Entwicklung, konsistentes Design
+   - Vorteile:
+     - Utility-First Ansatz
+     - Gute Performance
+     - Einfache Anpassung
+
+4. **Radix UI / Shadcn**
+   - Warum: Barrierefreie, robuste Komponenten
+   - Vorteile:
+     - Vorgefertigte Komponenten
+     - Anpassbar
+     - Beste Practices
+
+### Code-Beispiele und Erklärungen
+
+1. **Komponenten-Pattern**
+   ```tsx
+   // Beispiel einer typischen Komponente
+   const TimerSection: React.FC<TimerSectionProps> = ({
+     onStart,
+     onStop
+   }) => {
+     // State Hooks
+     const [time, setTime] = useState(0);
+     
+     // Store Integration
+     const { projects } = useConfigurationStore();
+     
+     // Effect Hooks
+     useEffect(() => {
+       // Timer Logik
+     }, []);
+
+     return (
+       // JSX mit Tailwind
+     );
+   };
+   ```
+
+2. **Store-Pattern**
+   ```typescript
+   // Beispiel eines Zustand Stores
+   export const useTimeEntryStore = create<TimeEntryStore>()(
+     persist(
+       (set) => ({
+         entries: [],
+         addEntry: (entry) => 
+           set((state) => ({
+             entries: [...state.entries, entry]
+           })),
+         // weitere Methoden...
+       }),
+       {
+         name: 'time-entry-storage'
+       }
+     )
+   );
+   ```
+
+3. **Utility-Funktionen**
+   ```typescript
+   // Beispiel einer Hilfsfunktion
+   export const calculateDuration = (
+     start: Date,
+     end: Date,
+     pauses: Pause[]
+   ): number => {
+     // Berechnungslogik
+   };
+   ```
+
+### Architektur-Entscheidungen
+
+1. **Komponenten-Struktur**
+   - Warum funktionale Komponenten?
+     - Bessere Performance
+     - Einfachere Testbarkeit
+     - Hooks-Unterstützung
+
+2. **State Management**
+   - Warum Zustand?
+     - Einfache API
+     - Gute Performance
+     - Minimaler Boilerplate
+
+3. **Styling-Ansatz**
+   - Warum Tailwind?
+     - Schnelle Entwicklung
+     - Konsistentes Design
+     - Gute Performance
+
+## User Flow & Interaktionsmöglichkeiten
+
+### Grundlegende Benutzerinteraktion
+
+1. **Erster Einstieg**
+   - Startseite öffnen
+   - Übersicht der aktuellen Woche sehen
+   - Schnellzugriff auf häufige Aktionen
+   - Dark/Light Mode Auswahl
+
+2. **Hauptnavigation**
+   - Wechsel zwischen Zeiterfassung und Konfiguration
+   - Zugriff auf Wochenübersicht
+   - Schnellzugriff auf aktive Sitzung
+   - Einstellungen aufrufen
+
+### Detaillierte Benutzer-Flows
+
+1. **Zeiterfassung starten**
+   ```
+   Start → Aktivitätsauswahl → Timer starten
+   ├── Projekt wählen
+   │   └── Arbeitszeit oder Abwesenheit
+   ├── Aktivität auswählen
+   │   └── Vordefinierte Kategorien
+   └── Optional: Initialkommentar
+   ```
+
+2. **Laufende Zeiterfassung**
+   ```
+   Aktive Session
+   ├── Pause starten/beenden
+   │   └── Optional: Pausenkommentar
+   ├── Aktivität ändern
+   ├── Kommentar hinzufügen
+   └── Zeiterfassung beenden
+       └── Abschlusskommentar
+   ```
+
+3. **Nachträgliche Bearbeitung**
+   ```
+   Wochenübersicht → Eintrag auswählen
+   ├── Zeit anpassen
+   ├── Kommentare bearbeiten
+   ├── Kategorie ändern
+   └── Eintrag löschen
+   ```
+
+### Interaktionsmöglichkeiten nach Kontext
+
+1. **Zeiterfassung**
+   - **Neue Erfassung**
+     - Start-Button klicken
+     - Projekt aus Dropdown wählen
+     - Aktivität auswählen
+     - Optional: Kommentar eingeben
+     - Timer starten
+
+   - **Laufende Erfassung**
+     - Timer-Status einsehen
+     - Pause einlegen
+     - Aktivität wechseln
+     - Kommentare ergänzen
+     - Erfassung beenden
+
+   - **Nachbearbeitung**
+     - Zeiten korrigieren
+     - Kommentare ergänzen
+     - Kategorien anpassen
+     - Einträge löschen
+
+2. **Wochenübersicht**
+   - **Navigation**
+     - Zwischen Wochen wechseln
+     - Tage auswählen
+     - Einträge filtern
+
+   - **Analyse**
+     - Tageszeiten einsehen
+     - Wochenstatistik prüfen
+     - Projektverteilung ansehen
+     - Berichte generieren
+
+3. **Konfiguration**
+   - **Projekte**
+     - Neue Projekte anlegen
+     - Aktivitäten definieren
+     - Kategorien zuweisen
+     - Projekte archivieren
+
+   - **Einstellungen**
+     - Darstellung anpassen
+     - Zeitrundung konfigurieren
+     - Standardwerte setzen
+     - Export-Einstellungen
+
+### Spezielle Anwendungsfälle
+
+1. **Universitätszeiten**
+   ```
+   Abwesenheit → Uni Zeit
+   ├── Vorlesungszeit erfassen
+   ├── Prüfungszeiten dokumentieren
+   └── Projektarbeiten tracken
+   ```
+
+2. **Arbeitszeit im Unternehmen**
+   ```
+   Arbeitszeit → Aktivität
+   ├── Ausbildungszeit erfassen
+   ├── Projektarbeit dokumentieren
+   ├── Meetings protokollieren
+   └── Interne Arbeit tracken
+   ```
+
+3. **Abwesenheitsmanagement**
+   ```
+   Abwesenheit → Typ wählen
+   ├── Urlaub eintragen
+   ├── Krankheit dokumentieren
+   ├── Feiertage vermerken
+   └── Wellness Days buchen
+   ```
+
+### Benutzerinteraktions-Szenarien
+
+1. **Täglicher Arbeitsbeginn**
+   ```
+   1. Anwendung öffnen
+   2. "Start" Button klicken
+   3. Projekt "Arbeitszeit" wählen
+   4. Passende Aktivität auswählen
+   5. Optional: Startkommentar eingeben
+   6. Timer starten
+   ```
+
+2. **Pausenmanagement**
+   ```
+   1. Pause-Button in aktiver Session klicken
+   2. Optional: Pausengrund dokumentieren
+   3. Nach Pause: Fortsetzen-Button klicken
+   4. Automatische Pausenzeitberechnung
+   ```
+
+3. **Tagesabschluss**
+   ```
+   1. Laufende Zeiterfassung beenden
+   2. Abschlusskommentar eingeben
+   3. Wochenübersicht prüfen
+   4. Bei Bedarf: Zeiten korrigieren
+   5. Optional: Bericht exportieren
+   ```
+
+### Benutzerfreundlichkeit & Hilfestellung
+
+1. **Erste Schritte**
+   - Intuitive Startseite
+   - Klare Buttonbeschriftungen
+   - Kontexthilfe bei Hovern
+   - Tooltips für Funktionen
+
+2. **Fehlerprävention**
+   - Validierung von Eingaben
+   - Warnungen bei ungewöhnlichen Zeiten
+   - Bestätigungsdialoge bei kritischen Aktionen
+   - Automatische Speicherung
+
+3. **Feedback & Guidance**
+   - Status-Meldungen
+   - Fortschrittsanzeigen
+   - Erfolgsbestätigungen
+   - Fehlermeldungen mit Lösungsvorschlägen
+
+## Kundenprojekt-Integration
+
+### Erweiterte Projekthierarchie
+```typescript
+// Erweitertes Datenmodell für Kundenprojekte
+interface CustomerProject extends Project {
+  customerId: string;
+  customerName: string;
+  projects: {
+    projectId: string;
+    projectName: string;
+    categories: {
+      categoryId: string;
+      categoryName: string;
+      chargeableProjectId?: string;     // Für abrechenbare Zeiten
+      nonChargeableProjectId?: string;  // Für nicht-abrechenbare Zeiten
+    }[];
+  }[];
+}
+
+// Erweitertes Store Interface
+interface ConfigurationStore {
+  // Bestehende Projekte (Abwesenheit, Arbeitszeit)
+  internalProjects: Project[];
+  // Neue Kundenprojekte
+  customerProjects: CustomerProject[];
+  
+  // Neue Methoden
+  addCustomer: (customer: CustomerProject) => void;
+  addProjectToCustomer: (customerId: string, project: Project) => void;
+  addCategoryToProject: (
+    customerId: string, 
+    projectId: string, 
+    category: Category
+  ) => void;
+}
+```
+
+### Anpassungen der Komponenten
+
+1. **ConfigurationSection**
+   ```typescript
+   const ConfigurationSection = () => {
+     // Bestehende Tabs
+     const tabs = [
+       { id: 'internal', label: 'Interne Projekte' },
+       { id: 'customers', label: 'Kundenprojekte' }
+     ];
+
+     // Neue Komponenten für Kundenprojekte
+     const CustomerProjectsView = () => (
+       <div>
+         {customerProjects.map(customer => (
+           <CustomerSection 
+             customer={customer}
+             onAddProject={handleAddProject}
+             onAddCategory={handleAddCategory}
+           />
+         ))}
+         <AddCustomerButton />
+       </div>
+     );
+   };
+   ```
+
+2. **TimerSection Erweiterung**
+   ```typescript
+   const TimerSection = () => {
+     // Erweiterte Typ-Auswahl
+     const timeTypes = [
+       { id: 'work', label: 'Arbeitszeit im Unternehmen' },
+       { id: 'absence', label: 'Abwesenheit' },
+       { id: 'customer', label: 'Kundenprojekt' }
+     ];
+
+     // Erweiterte Projektauswahl
+     const ProjectSelector = () => {
+       if (selectedType === 'customer') {
+         return (
+           <CustomerProjectSelector
+             customers={customerProjects}
+             onSelectProject={handleProjectSelect}
+             onSelectCategory={handleCategorySelect}
+           />
+         );
+       }
+       // ... bestehende Logik für interne Projekte
+     };
+   };
+   ```
+
+### Neue Komponenten für Kundenprojekte
+
+1. **CustomerSection**
+   ```typescript
+   const CustomerSection = ({ customer, onAddProject, onAddCategory }) => {
+     return (
+       <Card>
+         <CustomerHeader customer={customer} />
+         <ProjectsList projects={customer.projects} />
+         <CategoryConfiguration 
+           project={selectedProject}
+           onAddCategory={onAddCategory}
+         />
+         <ChargeableSettings 
+           category={selectedCategory}
+           onUpdateProjectIds={handleProjectIdUpdate}
+         />
+       </Card>
+     );
+   };
+   ```
+
+2. **CustomerProjectSelector**
+   ```typescript
+   const CustomerProjectSelector = ({ 
+     customers, 
+     onSelectProject,
+     onSelectCategory 
+   }) => {
+     // Hierarchische Auswahl:
+     // 1. Kunde
+     // 2. Projekt
+     // 3. Kategorie
+     // 4. Chargeable/Non-Chargeable
+     return (
+       <div className="space-y-4">
+         <CustomerDropdown customers={customers} />
+         <ProjectDropdown projects={selectedCustomer?.projects} />
+         <CategoryDropdown categories={selectedProject?.categories} />
+         <ChargeableToggle 
+           category={selectedCategory}
+           onToggle={handleChargeableToggle}
+         />
+       </div>
+     );
+   };
+   ```
+
+### Zeiterfassungs-Logik für Kundenprojekte
+
+```typescript
+interface CustomerTimeEntry extends TimeEntry {
+  customerId: string;
+  projectId: string;
+  categoryId: string;
+  isChargeable: boolean;
+  billingProjectId: string;  // Entweder chargeable oder non-chargeable ID
+}
+
+// Erweiterter Store
+interface TimeEntryStore {
+  // ... bestehende Eigenschaften
+  
+  startCustomerEntry: (entry: CustomerTimeEntry) => void;
+  updateCustomerEntry: (id: string, updates: Partial<CustomerTimeEntry>) => void;
+}
+```
+
+### Datenfluss für Kundenprojekte
+
+1. **Konfiguration**
+   ```
+   Kunde anlegen
+   └── Projekt hinzufügen
+       └── Kategorien definieren
+           ├── Chargeable Project ID
+           └── Non-Chargeable Project ID
+   ```
+
+2. **Zeiterfassung**
+   ```
+   Typ "Kundenprojekt" wählen
+   └── Kunde auswählen
+       └── Projekt auswählen
+           └── Kategorie auswählen
+               └── Chargeable/Non-Chargeable wählen
+                   └── Zeit erfassen
+   ```
+
+### Anpassungen der bestehenden Funktionalität
+
+1. **WeeklyOverview**
+   - Erweiterte Tabelle mit Kundeninformationen
+   - Filteroptionen für Kundenansicht
+   - Separate Summierung für Kundenprojekte
+
+2. **Reporting**
+   - Kundenspezifische Auswertungen
+   - Chargeable vs. Non-Chargeable Analyse
+   - Projektbezogene Berichte
+

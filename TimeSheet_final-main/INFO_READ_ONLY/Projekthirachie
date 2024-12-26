@@ -1,0 +1,35 @@
+#READ ONLY_THIS FILE IS FOR BETTER UNDERSTANDING NO CHANGES
+
+Abwesenheit (Project ID: 890085)
+├── Aktivität: Uni Zeit
+│   ├── Category: H03147 - Other Paid Time off
+│   └── external comment: studying at DHBW university
+├── Aktivität: Krankheitstage
+│   └── Category: H03128 - Sickness Leave
+│   └── external comment: Sickness Leave
+├── Aktivität: Urlaub
+│   └── Category: H03118 - Holiday
+│   └── external comment: Holiday
+├── Aktivität: Feiertag
+│   ├── Category: H03003 - Time off - Paid absence / non-holiday
+│   └── external comment: Bank holiday
+└── Aktivität: Wellness Day
+    ├── Category: H03003 - Time off - Paid absence / non-holiday
+    └── external comment: Wellness Day
+
+Arbeitszeit im Unternehmen (Project ID: 890023)
+├── Aktivität: Ausbildungszeit im Unternehmen
+│   ├── Category: H03107 - Internal - Professional development and training
+│   └── external comment: z. B. Tutorials, Lehrgänge, etc., die während der Arbeitszeit gemacht werden
+├── Aktivität: Projektarbeit
+│   └── Category: H03108 - Internal - Career development / mentoring    
+│   └── external comment: Projectarbeit
+├── Aktivität: One2One Termine
+│   └── Category: H03108 - Internal - Career development / mentoring
+│   └── external comment: development, mentoring
+├── Aktivität: Interne Meetings
+│   ├── Category: H03104 - Internal - Non-client / internal meeting
+│   └── external comment: Munich Location Meeting, Merkle Germany Monthly Session, etc.
+└── Aktivität: Interne Arbeit
+    └── Category: H03105 - Internal - Internal - Non-client operational activities 
+    └── external comment: Internal Arbeit
